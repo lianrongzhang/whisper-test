@@ -27,8 +27,11 @@ jobs:
         uses: appleboy/whisper-action@main
         with:
           youtube-url: "https://www.youtube.com/watch?v=${{ matrix.url }}"
-          model: 'base'
-          language: 'zh'
+          model: 'medium'
+          output_format: srt
+          output_folder: output
+          print_segment: true
+          debug: true
           
       - name: Bump version and push tag
         id: tag_version
