@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - id: set-matrix
         run: |
-          echo "matrix=$(jq -c '{url: [.videos[].url]}' all_channels_TOP10%_videos.json)" >> $GITHUB_OUTPUT
+          echo "matrix=$(jq -c '{url: [.videos[].video_id]}' all_channels_TOP10%_videos.json)" >> $GITHUB_OUTPUT
   
   transcribe:
     needs: prepare
@@ -26,7 +26,7 @@ jobs:
       - name: Transcribe video
         uses: lianrongzhang/whisper-action@main
         with:
-          youtube-url: ${{ matrix.url }}
+          youtube-url: "https://www.youtube.com/watch?v=${{ matrix.url }}"
           model: 'base'
           language: 'zh'
           
