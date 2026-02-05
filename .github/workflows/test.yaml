@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Transcribe video
-        uses: lianrongzhang/whisper-action@main
+        uses: appleboy/whisper-action@main
         with:
           youtube-url: "https://www.youtube.com/watch?v=${{ matrix.url }}"
           model: 'base'
