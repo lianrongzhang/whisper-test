@@ -1,37 +1,44 @@
-# name: Matrix YouTube Transcription
+name: Faster-Whisper Transcription
 
-# on:
-#   workflow_dispatch:
-#   push: 
+on:
+  workflow_dispatch:
 
-# jobs:
-#     transcribing:
-#       runs-on: ubuntu-latest
-#       steps:
-#         - uses: actions/checkout@v4
-        
-#         - uses: prefix-dev/setup-pixi@v0.9.4
-#           with:
-#             cache: true
-#             cache-write: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-    
-#         - name: Transcribe
-#           run: |
-#             yes | pixi run python batch_transcribe_all_videos.py
-            
-#         - name: Bump version and push tag
-#           id: tag_version
-#           uses: mathieudutour/github-tag-action@v6.2
-#           with:
-#             github_token: ${{ secrets.GITHUB_TOKEN }}
-    
-#         - name: Create a new release
-#           uses: softprops/action-gh-release@v2
-#           with:
-#             tag_name: ${{ steps.tag_version.outputs.new_tag }}
-#             make_latest: true
-#             generate_release_notes: true
-#             fail_on_unmatched_files: false
-#             prerelease: false
-#             files: |
-#               output/*
+jobs:
+  transcribe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360   # 防止超長卡死（可調）
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install Python deps
+        run: |
+          pip install --no-cache-dir faster-whisper ffmpeg-python tqdm
+
+      - name: List audio files (debug)
+        run: |
+          echo "Audio files:"
+          ls -lh audio || true
+
+      - name: Run transcription
+        run: |
+          python transcribe_fw.py
+
+      - name: Upload transcripts (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: transcripts
+          path: transcripts/
+          retention-days: 14
