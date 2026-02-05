@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - id: set-matrix
         run: |
-          echo "matrix=$(jq -c '{url: [.videos[].video_id]}' all_channels_TOP10%_videos.json)" >> $GITHUB_OUTPUT
+          echo "matrix=$(jq -c '{url: [.videos[].video_id]}' CTWANT_videos.json)" >> $GITHUB_OUTPUT
   
   transcribe:
     needs: prepare
