@@ -1,6 +1,6 @@
 name: Faster-Whisper Transcription
 
-on:
+"on":
   workflow_dispatch:
 
 jobs:
