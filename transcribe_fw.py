@@ -12,6 +12,7 @@ OUT_DIR.mkdir(exist_ok=True)
 if not AUDIO_DIR.exists():
     print(f"Warning: Audio directory '{AUDIO_DIR}' does not exist.")
     print("Please create the 'audio' directory and add MP3 files to transcribe.")
+    # Exit with 0 to keep workflow green when no audio is expected
     sys.exit(0)
 
 # Check if there are any audio files
@@ -19,6 +20,7 @@ audio_files = list(AUDIO_DIR.glob("*.mp3"))
 if not audio_files:
     print(f"Warning: No MP3 files found in '{AUDIO_DIR}' directory.")
     print("Please add MP3 files to transcribe.")
+    # Exit with 0 to keep workflow green when no audio is expected
     sys.exit(0)
 
 print(f"Found {len(audio_files)} audio file(s) to transcribe")
