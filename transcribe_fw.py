@@ -1,14 +1,45 @@
 from faster_whisper import WhisperModel
 from pathlib import Path
 from tqdm import tqdm
+import os
+
+# =========================
+# Paths
+# =========================
 
 AUDIO_DIR = Path("audio")
 OUT_DIR = Path("transcripts")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
+# =========================
+# Shard config（一定要最前面）
+# =========================
+
+SHARD_ID = int(os.environ.get("SHARD_ID", "0"))
+TOTAL_SHARDS = int(os.environ.get("TOTAL_SHARDS", "1"))
+
+audio_files = sorted(
+    list(AUDIO_DIR.glob("*.mp3")) +
+    list(AUDIO_DIR.glob("*.wav"))
+)
+
+audio_files = [
+    f for i, f in enumerate(audio_files)
+    if i % TOTAL_SHARDS == SHARD_ID
+]
+
+print(
+    f"🔀 Shard {SHARD_ID}/{TOTAL_SHARDS} "
+    f"→ {len(audio_files)} audio files"
+)
+
+# =========================
+# Model
+# =========================
+
 MODEL_SIZE = "medium"
 DEVICE = "cpu"
-COMPUTE_TYPE = "int8"   # ⭐ GitHub Actions 必選
+COMPUTE_TYPE = "int8"   # GitHub Actions 必選
 
 model = WhisperModel(
     MODEL_SIZE,
@@ -16,12 +47,9 @@ model = WhisperModel(
     compute_type=COMPUTE_TYPE
 )
 
-audio_files = sorted(
-    list(AUDIO_DIR.glob("*.mp3")) +
-    list(AUDIO_DIR.glob("*.wav"))
-)
-
-print(f"🔊 Found {len(audio_files)} audio files")
+# =========================
+# Transcription
+# =========================
 
 for audio_path in tqdm(audio_files, desc="Transcribing"):
     video_id = audio_path.stem
