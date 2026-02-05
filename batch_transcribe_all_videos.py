@@ -606,9 +606,9 @@ def main():
     print("="*80)
     
     # 设置参数
-    data_dir = '/home/user/Youtube/data'
-    transcripts_dir = '/home/user/Youtube/transcripts_all'
-    sample_json = "/home/user/Youtube/all_channels_TOP10%_videos.json"
+    data_dir = './data'
+    transcripts_dir = './transcripts_all'
+    sample_json = "./中天新聞_videos.json"
     start_date = "2024-01-01"  # 开始日期
     end_date = "2025-10-31"    # 结束日期
     
@@ -663,7 +663,7 @@ def main():
     
     # 步骤4: 保存影片列表
     video_list_file = processor.save_video_list(
-        '/home/user/Youtube/all_videos_list_2024-2025.csv'
+        './all_videos_list_2024-2025.csv'
     )
     
     print(f"\n已保存影片列表: {video_list_file}")

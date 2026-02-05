@@ -1,0 +1,19 @@
+[workspace]
+authors = ["lianrongzhang <zlianrong1224@gmail.com>"]
+channels = ["conda-forge"]
+name = "whisper-test"
+platforms = ["win-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+yt-dlp = ">=2026.2.4,<2027"
+ffmpeg = ">=8.0.1,<9"
+cuda = "12.8.*"
+cudnn = ">=9.10.2.21,<10"
+
+[pypi-dependencies]
+openai-whisper = ">=20250625, <20250626"
+torch = { version = "==2.10.0", index = "https://download.pytorch.org/whl/cu128" }
+torchvision = { version = "*", index = "https://download.pytorch.org/whl/cu128" }
