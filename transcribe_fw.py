@@ -1,33 +1,14 @@
-# transcribe_fw.py
 from faster_whisper import WhisperModel
 from pathlib import Path
-import json
-import sys
+from tqdm import tqdm
 
 AUDIO_DIR = Path("audio")
 OUT_DIR = Path("transcripts")
-OUT_DIR.mkdir(exist_ok=True)
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Check if audio directory exists
-if not AUDIO_DIR.exists():
-    print(f"Warning: Audio directory '{AUDIO_DIR}' does not exist.")
-    print("Please create the 'audio' directory and add MP3 files to transcribe.")
-    # Exit with 0 to keep workflow green when no audio is expected
-    sys.exit(0)
-
-# Check if there are any audio files
-audio_files = list(AUDIO_DIR.glob("*.mp3"))
-if not audio_files:
-    print(f"Warning: No MP3 files found in '{AUDIO_DIR}' directory.")
-    print("Please add MP3 files to transcribe.")
-    # Exit with 0 to keep workflow green when no audio is expected
-    sys.exit(0)
-
-print(f"Found {len(audio_files)} audio file(s) to transcribe")
-
-MODEL_SIZE = "medium"   # or small / large-v3
-DEVICE = "cpu"          # GitHub Actions 預設
-COMPUTE_TYPE = "int8"   # 關鍵：CI 友善
+MODEL_SIZE = "medium"
+DEVICE = "cpu"
+COMPUTE_TYPE = "int8"   # ⭐ GitHub Actions 必選
 
 model = WhisperModel(
     MODEL_SIZE,
@@ -35,26 +16,31 @@ model = WhisperModel(
     compute_type=COMPUTE_TYPE
 )
 
-for audio_path in audio_files:
+audio_files = sorted(
+    list(AUDIO_DIR.glob("*.mp3")) +
+    list(AUDIO_DIR.glob("*.wav"))
+)
+
+print(f"🔊 Found {len(audio_files)} audio files")
+
+for audio_path in tqdm(audio_files, desc="Transcribing"):
     video_id = audio_path.stem
     out_txt = OUT_DIR / f"{video_id}.txt"
 
-    if out_txt.exists():
-        print(f"Skipping {video_id} (already transcribed)")
+    if out_txt.exists() and out_txt.stat().st_size > 0:
         continue
 
-    print(f"Transcribing {video_id}...")
-    segments, info = model.transcribe(
-        str(audio_path),
-        language="zh",
-        beam_size=5,
-        vad_filter=True
-    )
+    try:
+        segments, info = model.transcribe(
+            str(audio_path),
+            language="zh",
+            beam_size=5,
+            vad_filter=True
+        )
 
-    with open(out_txt, "w", encoding="utf-8") as f:
-        for seg in segments:
-            f.write(f"[{seg.start:.2f}-{seg.end:.2f}] {seg.text}\n")
-    
-    print(f"✓ Completed {video_id}")
+        with open(out_txt, "w", encoding="utf-8") as f:
+            for seg in segments:
+                f.write(f"[{seg.start:.2f}-{seg.end:.2f}] {seg.text}\n")
 
-print(f"\nTranscription complete! Check the '{OUT_DIR}' directory for results.")
+    except Exception as e:
+        print(f"❌ Failed {video_id}: {e}")
