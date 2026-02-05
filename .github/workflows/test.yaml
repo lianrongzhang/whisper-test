@@ -26,7 +26,7 @@ jobs:
       - name: Transcribe video
         uses: appleboy/whisper-action@main
         with:
-          youtube-url: "https://www.youtube.com/watch?v=${{ matrix.url }}"
+          youtube_url: "https://www.youtube.com/watch?v=${{ matrix.url }}"
           model: 'medium'
           output_format: srt
           output_folder: output
