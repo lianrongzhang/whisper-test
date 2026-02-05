@@ -17,7 +17,7 @@ jobs:
     
         - name: Transcribe
           run: |
-            pixi run python batch_transcribe_all_videos.py
+            yes | pixi run python batch_transcribe_all_videos.py
             
         - name: Bump version and push tag
           id: tag_version
