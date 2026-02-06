@@ -1,4 +1,4 @@
-from faster_whisper import WhisperModel
+from faster_whisper import WhisperModel, BatchedInferencePipeline
 from pathlib import Path
 from tqdm import tqdm
 import os
