@@ -41,11 +41,12 @@ MODEL_SIZE = "medium"
 DEVICE = "cpu"
 COMPUTE_TYPE = "int8"   # GitHub Actions 必選
 
-model = WhisperModel(
+single_model = WhisperModel(
     MODEL_SIZE,
     device=DEVICE,
     compute_type=COMPUTE_TYPE
 )
+model = BatchedInferencePipeline(model=single_model)
 
 # =========================
 # Transcription
@@ -63,7 +64,8 @@ for audio_path in tqdm(audio_files, desc="Transcribing"):
             str(audio_path),
             language="zh",
             beam_size=5,
-            vad_filter=True
+            vad_filter=True,
+            batch_size=16
         )
 
         with open(out_txt, "w", encoding="utf-8") as f:
